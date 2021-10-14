@@ -11,7 +11,7 @@ function ShellCommand() {
   //   "Get-WmiObject -Class Win32_Product -ComputerName 192.168.2.20 | select __SERVER , Name, Version -ErrorAction SilentlyContinue"
   // );
   ps.addCommand(
-    "Invoke-Command -ComputerName 192.168.2.20 -ScriptBlock {powershell.exe c:install_source\notepad_install.exe /sAll /msi /norestart ALLUSERS=1 EULA_ACCEPT=YES}"
+    "Invoke-Command -ComputerName 192.168.2.20 -ScriptBlock { Start-Process c:\\install_source\notepad_install   -Wait}"
   );
   ps.invoke()
     .then((output) => {
