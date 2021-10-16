@@ -1,36 +1,44 @@
 import Express from "express";
 import Shell from "node-powershell";
 
-function ShellCommand() {
+function installapp(appname, computername) {
   const ps = new Shell({
     executionPolicy: "Bypass",
     noProfile: true,
   });
-  var res = "";
-  // ps.addCommand(
-  //   "Get-WmiObject -Class Win32_Product -ComputerName 192.168.2.20 | select __SERVER , Name, Version -ErrorAction SilentlyContinue"
-  // );
+  ps.addCommand("$session = New-PSSession -ComputerName " + computername);
   ps.addCommand(
-    "Invoke-Command -ComputerName 192.168.2.20 -ScriptBlock { Start-Process c:\\install_source\notepad_install   -Wait}"
+    "Invoke-Command -Session $session -ScriptBlock {winget install '" +
+      appname +
+      "' --accept-package-agreements --accept-source-agreements }"
   );
+  ps.addCommand("Remove-PSSession $session");
   ps.invoke()
     .then((output) => {
       console.log(output);
-      res = output;
     })
     .catch((error) => {
       console.log(error);
-      res = error;
     });
-  return res;
 }
 
 const app = Express();
+app.use(Express.urlencoded({ extended: true }));
+app.use(Express.json());
 const port = 5100;
 
-app.get("/", (req, res) => {
-  var info = ShellCommand();
-  res.json(info);
+app.post("/winget/install", (req, res) => {
+  console.log(req);
+  var appname = req.body.applicationname;
+  var computername = req.body.computername;
+  installapp(appname, computername);
+  res.send(
+    "l'application " +
+      appname +
+      " a été installée sur le poste " +
+      computername +
+      " avec succes"
+  );
 });
 
 app.listen(port, () => {
