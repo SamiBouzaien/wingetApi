@@ -13,13 +13,16 @@ function installapp(appname, computername) {
       "' --accept-package-agreements --accept-source-agreements }"
   );
   ps.addCommand("Remove-PSSession $session");
+  let res = false;
   ps.invoke()
     .then((output) => {
       console.log(output);
+      res = true;
     })
     .catch((error) => {
       console.log(error);
     });
+  return res;
 }
 
 const app = Express();
@@ -31,14 +34,23 @@ app.post("/winget/install", (req, res) => {
   console.log(req);
   var appname = req.body.applicationname;
   var computername = req.body.computername;
-  installapp(appname, computername);
-  res.send(
-    "l'application " +
+  var res = installapp(appname, computername);
+  var message = "";
+  if (res) {
+    message =
+      "l'application " +
       appname +
       " a été installée sur le poste " +
       computername +
-      " avec succes"
-  );
+      " avec succes";
+  } else {
+    message =
+      "Echec d'installation de l'application " +
+      appname +
+      "  sur le poste " +
+      computername;
+  }
+  res.send(message);
 });
 
 app.listen(port, () => {
