@@ -34,9 +34,9 @@ app.post("/winget/install", (req, res) => {
   console.log(req);
   var appname = req.body.applicationname;
   var computername = req.body.computername;
-  var res = installapp(appname, computername);
+  var isvalid = installapp(appname, computername);
   var message = "";
-  if (res) {
+  if (isvalid) {
     message =
       "l'application " +
       appname +
