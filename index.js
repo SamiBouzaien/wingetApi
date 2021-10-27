@@ -1,42 +1,19 @@
-import Express from "express";
-import Shell from "node-powershell";
-
-function installapp(appname, computername) {
-  const ps = new Shell({
-    executionPolicy: "Bypass",
-    noProfile: true,
-  });
-  ps.addCommand("$session = New-PSSession -ComputerName " + computername);
-  ps.addCommand(
-    "Invoke-Command -Session $session -ScriptBlock {winget install '" +
-      appname +
-      "' --accept-package-agreements --accept-source-agreements }"
-  );
-  ps.addCommand("Remove-PSSession $session");
-  let res = false;
-  ps.invoke()
-    .then((output) => {
-      console.log(output);
-      res = true;
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-  return res;
-}
-
+const Express = require("express");
+const swaggerUi = require("swagger-ui-express");
+const swaggerDocument = require("./swagger.json");
+const servicewinget = require("./services/service-winget");
 const app = Express();
 app.use(Express.urlencoded({ extended: true }));
 app.use(Express.json());
 const port = 5100;
 
 app.post("/winget/install", (req, res) => {
-  console.log(req);
   var appname = req.body.applicationname;
   var computername = req.body.computername;
-  var res = installapp(appname, computername);
+  var isvalid = servicewinget.install(appname, computername);
+  console.log("isvalid => " + isvalid);
   var message = "";
-  if (res) {
+  if (isvalid) {
     message =
       "l'application " +
       appname +
@@ -50,9 +27,10 @@ app.post("/winget/install", (req, res) => {
       "  sur le poste " +
       computername;
   }
-  res.send(message);
+  res.status(200).send(message);
 });
-
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.listen(port, () => {
-  console.log("listening on port " + port);
+  console.log("server running at http://localhost:" + port);
+  console.log("swagger running at http://localhost:" + port + "/api-docs");
 });
