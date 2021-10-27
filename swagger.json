@@ -1,0 +1,60 @@
+{
+    "swagger": "2.0",
+    "info": {
+      "version": "1.0.0", 
+      "title": "API demo Winget",
+      "description": "Web API demo pour gerer les installation via Winget",
+      "license": {
+        "name": "MIT",
+        "url": "https://opensource.org/licenses/MIT"
+      }
+    },
+    "host": "localhost:5100",
+    "basePath": "/",
+    "tags": [
+      {
+        "name": "Winget",
+        "description": "API demo Winget"
+      }
+    ],
+    "schemes": ["http"],
+    "consumes": ["application/json"],
+    "produces": ["application/json"],
+    "paths": {
+      "/winget/install": {
+        "post": {
+          "tags": ["Winget"],
+          "description": "Create new user in system",
+          "parameters": [
+            {
+              "name": "params",
+              "in": "body",
+              "description": "paramétres installation",
+              "schema": {
+                "$ref": "#/definitions/params"
+              }
+            }          
+          ],
+          "produces": ["application/json"],
+          "responses": {
+            "200": {
+              "description": "application installée avec succes"
+            }
+          }
+        }
+      }
+    },
+    "definitions": {
+      "params": {
+        "required": ["applicationname", "computername"],
+        "properties": {
+          "applicationname": {
+            "type": "string"
+          },
+          "computername": {
+            "type": "string"
+          }
+        }
+      }
+  }
+}
