@@ -1,7 +1,15 @@
+### configuration de WinRM sur un poste client
+
 > WinRM quickconfig
 
 > WinRM get winrm/config/client
 
 > Set-Item WSMan:localhost\client\trustedhosts -value \*
 
-> Invoke-Command -ComputerName 192.168.2.20 -ScriptBlock {powershell.exe c:Install\notepad_install.exe /sAll /msi /norestart ALLUSERS=1 EULA_ACCEPT=YES}
+### Utilisation de session powershell pour lancer la commande d'installation winget sur un poste client
+
+> $session = New-PSSession -ComputerName 192.168.2.20
+
+> Invoke-Command -Session $session -ScriptBlock {winget install 'Visual Code Editor' --accept-package-agreements --accept-source-agreements }
+
+> Remove-PSSession $session
